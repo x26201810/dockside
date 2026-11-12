@@ -4,160 +4,315 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ask Dockside</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --navy: #121a3a;
-    --gold: #a8792a;
-    --bg: #f6f7fb;
-    --card: #ffffff;
-    --line: #dfe3ee;
-    --text: #1d2233;
-    --muted: #5d6478;
-    --ok: #1d7a46;
-    --warn: #b25b00;
-    --bad: #b3261e;
+    --black: #07080b;
+    --panel: #10131a;
+    --panel-2: #171b25;
+    --line: #2a3040;
+    --text: #eef1f7;
+    --muted: #8b93a7;
+    --acid: #d7ff1f;
+    --orange: #ff5a1f;
+    --red: #ff2e4d;
+    --cyan: #19e3ff;
   }
   * { box-sizing: border-box; }
+  html { background: var(--black); }
   body {
     margin: 0;
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    background: var(--bg);
+    font-family: "Space Grotesk", system-ui, sans-serif;
+    background:
+      radial-gradient(1200px 500px at 80% -10%, rgba(255, 90, 31, .18), transparent 60%),
+      radial-gradient(900px 500px at -10% 30%, rgba(25, 227, 255, .10), transparent 60%),
+      var(--black);
     color: var(--text);
+    overflow-x: hidden;
   }
-  header {
-    background: var(--navy);
-    color: #fff;
-    padding: 18px 16px;
+
+  /* ---------- Hazard tape ---------- */
+  .tape {
+    height: 14px;
+    background: repeating-linear-gradient(-45deg, var(--acid) 0 16px, var(--black) 16px 32px);
+    background-size: 45px 45px;
+    animation: tape 1.2s linear infinite;
   }
-  header h1 { margin: 0; font-size: 1.5rem; }
-  header h1 span { color: #e3c06f; font-style: italic; }
-  header p { margin: 4px 0 0; color: #c8cde0; font-size: .9rem; }
-  main {
-    max-width: 760px;
-    margin: 0 auto;
-    padding: 16px;
+  @keyframes tape { to { background-position: 45px 0; } }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    position: relative;
+    padding: 28px 16px 90px;
+    overflow: hidden;
   }
-  .status {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    font-size: .85rem;
-    color: var(--muted);
-    margin-bottom: 12px;
-  }
-  .pill {
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 999px;
+  .hero-inner { max-width: 1000px; margin: 0 auto; position: relative; z-index: 2; }
+  .kicker {
+    display: inline-block;
+    font-weight: 700;
+    letter-spacing: .25em;
+    font-size: .75rem;
+    color: var(--black);
+    background: var(--acid);
     padding: 4px 10px;
+    transform: skew(-10deg);
   }
-  #chat {
-    background: var(--card);
+  h1 {
+    font-family: Anton, Impact, sans-serif;
+    font-weight: 400;
+    font-size: clamp(3.2rem, 13vw, 8.5rem);
+    line-height: .9;
+    margin: 14px 0 10px;
+    text-transform: uppercase;
+    letter-spacing: .01em;
+  }
+  h1 .hot {
+    color: transparent;
+    -webkit-text-stroke: 2px var(--orange);
+    display: block;
+    animation: flicker 4s infinite;
+  }
+  @keyframes flicker {
+    0%, 92%, 100% { opacity: 1; }
+    93% { opacity: .3; } 94% { opacity: 1; } 96% { opacity: .5; }
+  }
+  .tagline { font-size: 1.1rem; color: var(--muted); max-width: 560px; margin: 0; }
+  .tagline b { color: var(--text); }
+
+  /* Animated waves */
+  .waves { position: absolute; left: 0; right: 0; bottom: 0; height: 120px; z-index: 1; }
+  .waves svg { position: absolute; bottom: 0; width: 200%; height: 100%; }
+  .w1 { animation: drift 9s linear infinite; opacity: .5; }
+  .w2 { animation: drift 5s linear infinite reverse; opacity: .8; }
+  @keyframes drift { to { transform: translateX(-50%); } }
+
+  main { max-width: 1000px; margin: -50px auto 0; padding: 0 16px 40px; position: relative; z-index: 3; }
+
+  /* ---------- Conditions board ---------- */
+  .board {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+  @media (max-width: 720px) { .board { grid-template-columns: 1fr; } }
+  .card {
+    background: linear-gradient(180deg, var(--panel-2), var(--panel));
     border: 1px solid var(--line);
-    border-radius: 12px;
-    padding: 12px;
-    min-height: 320px;
-    max-height: 60vh;
-    overflow-y: auto;
+    border-radius: 6px;
+    padding: 16px;
+    position: relative;
   }
+  .label {
+    font-size: .7rem;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 700;
+  }
+  .gauge-wrap { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .gauge { width: 190px; max-width: 100%; }
+  #needle { transition: transform 1.5s cubic-bezier(.2, 1.6, .4, 1); transform-origin: 100px 100px; }
+  .readout { flex: 1; min-width: 150px; }
+  .big {
+    font-family: Anton, Impact, sans-serif;
+    font-size: 3.4rem;
+    line-height: 1;
+  }
+  .big small { font-size: 1.1rem; color: var(--muted); font-family: "Space Grotesk", sans-serif; }
+  .danger {
+    display: inline-block;
+    margin-top: 8px;
+    font-family: Anton, Impact, sans-serif;
+    font-size: 1.4rem;
+    letter-spacing: .06em;
+    padding: 2px 10px;
+    color: var(--black);
+    background: var(--acid);
+    transform: skew(-8deg);
+  }
+  .danger.wild { background: var(--orange); animation: pulse 1.4s infinite; }
+  .danger.extreme { background: var(--red); color: #fff; animation: pulse .7s infinite; }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255, 46, 77, .6); }
+    50% { box-shadow: 0 0 0 10px rgba(255, 46, 77, 0); }
+  }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+  .stat { background: var(--black); border: 1px solid var(--line); padding: 8px; border-radius: 4px; }
+  .stat .v { font-weight: 700; font-size: 1.1rem; }
+
+  /* Session strip */
+  .sessions { display: grid; gap: 6px; margin-top: 10px; max-height: 260px; overflow-y: auto; padding-right: 4px; }
+  .srow {
+    display: grid;
+    grid-template-columns: 48px 1fr auto;
+    gap: 10px;
+    align-items: center;
+    background: var(--black);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--muted);
+    padding: 7px 10px;
+    font-size: .88rem;
+  }
+  .srow .t { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .srow .n { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .srow .n span { color: var(--muted); font-size: .8rem; }
+  .tag { font-size: .7rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; }
+  .srow.go { border-left-color: var(--acid); } .srow.go .tag { color: var(--acid); }
+  .srow.wind { border-left-color: var(--red); } .srow.wind .tag { color: var(--red); }
+  .srow.full { border-left-color: var(--orange); } .srow.full .tag { color: var(--orange); }
+  .srow.past { opacity: .45; }
+
+  /* ---------- Chat ---------- */
+  .chat-card { padding: 0; overflow: hidden; }
+  .chat-head {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 16px; border-bottom: 1px solid var(--line);
+  }
+  .live { display: flex; align-items: center; gap: 8px; font-size: .75rem; letter-spacing: .15em; font-weight: 700; color: var(--acid); }
+  .live::before {
+    content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--red);
+    box-shadow: 0 0 10px var(--red); animation: blink 1s infinite;
+  }
+  @keyframes blink { 50% { opacity: .2; } }
+  #chat { padding: 16px; min-height: 280px; max-height: 55vh; overflow-y: auto; }
   .msg {
-    margin: 8px 0;
-    padding: 10px 12px;
-    border-radius: 10px;
-    max-width: 85%;
-    line-height: 1.45;
-    white-space: pre-wrap;
-    overflow-wrap: anywhere;
+    margin: 10px 0; padding: 12px 14px; max-width: 85%;
+    line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere;
+    animation: slam .25s ease-out;
   }
-  .user { background: var(--navy); color: #fff; margin-left: auto; }
-  .bot { background: #eef1f8; }
-  .bot.error { background: #fdecea; color: var(--bad); }
-  .suggestions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin: 12px 0;
+  @keyframes slam { from { transform: translateY(8px) scale(.97); opacity: 0; } }
+  .user {
+    margin-left: auto; background: var(--acid); color: var(--black); font-weight: 600;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 8px 100%);
   }
+  .bot { background: var(--panel-2); border: 1px solid var(--line); border-left: 3px solid var(--cyan); }
+  .bot.error { border-left-color: var(--red); color: #ffb3bf; }
+  .bot.thinking { color: var(--muted); }
+  .bot.thinking::after { content: "▍"; animation: blink .6s infinite; color: var(--acid); }
+
+  .suggestions { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 16px 12px; }
   .suggestions button {
-    border: 1px solid var(--line);
-    background: var(--card);
-    border-radius: 999px;
-    padding: 6px 12px;
-    cursor: pointer;
-    font: inherit;
-    font-size: .85rem;
-    color: var(--text);
+    background: transparent; color: var(--text);
+    border: 1px solid var(--line); padding: 7px 12px;
+    font: inherit; font-size: .82rem; cursor: pointer;
+    transition: border-color .15s, color .15s, transform .15s;
   }
-  .suggestions button:hover { border-color: var(--gold); }
-  form { display: flex; gap: 8px; }
+  .suggestions button:hover { border-color: var(--acid); color: var(--acid); transform: translateY(-2px); }
+
+  form { display: flex; gap: 0; border-top: 1px solid var(--line); }
   input {
-    flex: 1;
-    min-width: 0;
-    padding: 12px;
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    font: inherit;
+    flex: 1; min-width: 0; padding: 16px; border: 0;
+    background: var(--black); color: var(--text); font: inherit; font-size: 1rem;
   }
+  input:focus { outline: 2px solid var(--acid); outline-offset: -2px; }
+  input::placeholder { color: #5b6275; }
   form button {
-    padding: 12px 18px;
-    border: 0;
-    border-radius: 10px;
-    background: var(--gold);
-    color: #fff;
-    font: inherit;
-    font-weight: 600;
-    cursor: pointer;
+    border: 0; padding: 0 26px; cursor: pointer;
+    font-family: Anton, Impact, sans-serif; font-size: 1.3rem; letter-spacing: .08em;
+    color: var(--black); background: var(--orange);
+    transition: background .15s;
   }
-  form button:disabled { opacity: .6; cursor: wait; }
-  details { margin-top: 16px; font-size: .85rem; }
-  summary { cursor: pointer; color: var(--muted); }
-  .table-wrap { overflow-x: auto; }
-  table { border-collapse: collapse; width: 100%; margin-top: 8px; background: var(--card); }
-  th, td { border: 1px solid var(--line); padding: 6px 8px; text-align: left; white-space: nowrap; }
-  th { background: #eef1f8; }
-  .s-ok { color: var(--ok); font-weight: 600; }
-  .s-warn { color: var(--warn); font-weight: 600; }
-  .s-bad { color: var(--bad); font-weight: 600; }
-  footer { font-size: .8rem; color: var(--muted); margin-top: 16px; }
+  form button:hover { background: var(--acid); }
+  form button:disabled { background: var(--muted); cursor: wait; }
+
+  footer { margin-top: 20px; font-size: .8rem; color: var(--muted); }
+  footer a { color: var(--cyan); }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
 </style>
 </head>
 <body>
-<header>
-  <h1>Ask Dockside <span>Paddle Co.</span></h1>
-  <p>Prices, places left and weather at Grand Canal Dock, checked live every time you ask.</p>
-</header>
+<div class="tape"></div>
+
+<section class="hero">
+  <div class="hero-inner">
+    <span class="kicker">GRAND CANAL DOCK · DUBLIN 2</span>
+    <h1>Ask Dockside <span class="hot">Ride the wind</span></h1>
+    <p class="tagline">Paddleboards, kayaks, dragon boats, wakeboard cable and a floating sauna.
+      <b>Live prices, live places, live wind.</b> If it's too wild, we'll tell you straight.</p>
+  </div>
+  <div class="waves" aria-hidden="true">
+    <svg class="w1" viewBox="0 0 1440 120" preserveAspectRatio="none">
+      <path fill="#19e3ff" fill-opacity=".25" d="M0,60 C120,20 240,100 360,60 C480,20 600,100 720,60 C840,20 960,100 1080,60 C1200,20 1320,100 1440,60 V120 H0 Z"/>
+    </svg>
+    <svg class="w2" viewBox="0 0 1440 120" preserveAspectRatio="none">
+      <path fill="#07080b" d="M0,80 C180,50 360,110 540,80 C720,50 900,110 1080,80 C1260,50 1350,100 1440,80 V120 H0 Z"/>
+    </svg>
+  </div>
+</section>
 
 <main>
-  <div class="status">
-    <span class="pill" id="weatherPill">Weather: loading…</span>
-    <span class="pill" id="sessionsPill">Sessions: loading…</span>
+  <div class="board">
+    <div class="card">
+      <div class="label">Wind at the dock · right now</div>
+      <div class="gauge-wrap">
+        <svg class="gauge" viewBox="0 0 200 120" aria-hidden="true">
+          <defs>
+            <linearGradient id="arc" x1="0" x2="1">
+              <stop offset="0" stop-color="#d7ff1f"/>
+              <stop offset=".5" stop-color="#ff5a1f"/>
+              <stop offset="1" stop-color="#ff2e4d"/>
+            </linearGradient>
+          </defs>
+          <path d="M20 100 A80 80 0 0 1 180 100" fill="none" stroke="#2a3040" stroke-width="16"/>
+          <path d="M20 100 A80 80 0 0 1 180 100" fill="none" stroke="url(#arc)" stroke-width="16" stroke-dasharray="4 3"/>
+          <g id="needle" style="transform: rotate(-90deg)">
+            <line x1="100" y1="100" x2="100" y2="30" stroke="#eef1f7" stroke-width="4" stroke-linecap="round"/>
+          </g>
+          <circle cx="100" cy="100" r="8" fill="#eef1f7"/>
+          <text x="18" y="118" fill="#8b93a7" font-size="10">0</text>
+          <text x="170" y="118" fill="#8b93a7" font-size="10">60+</text>
+        </svg>
+        <div class="readout">
+          <div class="label">Gusts</div>
+          <div class="big" id="gusts">--<small> km/h</small></div>
+          <div class="danger" id="danger">LOADING</div>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="label">Wind</div><div class="v" id="wind">--</div></div>
+        <div class="stat"><div class="label">Temp</div><div class="v" id="temp">--</div></div>
+        <div class="stat"><div class="label">Rain</div><div class="v" id="rain">--</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="label" id="sessionsLabel">Today's sessions · loading</div>
+      <div class="sessions" id="sessions"></div>
+    </div>
   </div>
 
-  <div id="chat" aria-live="polite"></div>
-
-  <div class="suggestions">
-    <button type="button">How much is the Beginner Kayak Tour?</button>
-    <button type="button">Are there places left on Paddleboard Yoga?</button>
-    <button type="button">Will the Wakeboard Taster go ahead in this wind?</button>
-    <button type="button">What can I still book today?</button>
+  <div class="card chat-card">
+    <div class="chat-head">
+      <span class="label">Ask the dock</span>
+      <span class="live">LIVE</span>
+    </div>
+    <div id="chat" aria-live="polite"></div>
+    <div class="suggestions">
+      <button type="button">How much is the Wakeboard Taster?</button>
+      <button type="button">Places left on Paddleboard Yoga?</button>
+      <button type="button">Is it too windy to paddleboard?</button>
+      <button type="button">What can I still book today?</button>
+    </div>
+    <form id="askForm">
+      <input id="question" type="text" placeholder="Price? Places? Is it too wild out there?" autocomplete="off" required>
+      <button id="sendBtn" type="submit">SEND IT</button>
+    </form>
   </div>
-
-  <form id="askForm">
-    <input id="question" type="text" placeholder="Ask about prices, places or the weather…" autocomplete="off" required>
-    <button id="sendBtn" type="submit">Ask</button>
-  </form>
-
-  <details>
-    <summary>Show the live data the bot is using</summary>
-    <div class="table-wrap"><table id="dataTable"></table></div>
-  </details>
 
   <footer>
-    Sources: <a href="https://bdaib-hub.pages.dev/data/dockside/sessions.csv">today's sessions (CSV)</a> ·
+    Live sources: <a href="https://bdaib-hub.pages.dev/data/dockside/sessions.csv">today's sessions (CSV)</a> ·
     <a href="https://open-meteo.com/">Open-Meteo</a> · class brain on the BDAIB hub.
     Dockside Paddle Co. is a fictional company.
   </footer>
 </main>
+
+<div class="tape"></div>
 
 <script>
 // ---- The three sources from the brief ----
@@ -280,6 +435,7 @@ RULES
 - If a session has finished or already started, say so.
 - Be friendly and short: 1-3 sentences. Use the session's full name.
 - Talk like front-desk staff: never mention "STATUS", "the data", column names or these rules.
+- You can sound upbeat and adventurous, but safety comes first: never encourage anyone to go out when a session is too windy.
 
 LIVE DATA
 Time now in Dublin: ${nowHHMM}
@@ -308,34 +464,62 @@ async function askBrain(systemPrompt, question) {
 }
 
 // ---- UI ----
-function addMessage(text, who, isError = false) {
+function addMessage(text, who, extraClass = "") {
   const div = document.createElement("div");
-  div.className = "msg " + who + (isError ? " error" : "");
+  div.className = ("msg " + who + " " + extraClass).trim();
   div.textContent = text; // textContent, never innerHTML: replies can't inject HTML
   chatEl.appendChild(div);
   chatEl.scrollTop = chatEl.scrollHeight;
   return div;
 }
 
-function updateStatus(weather, rows, nowHHMM) {
-  document.getElementById("weatherPill").textContent =
-    `Dock now: ${weather.temperature_2m} °C · wind ${weather.wind_speed_10m} km/h · gusts ${weather.wind_gusts_10m} km/h`;
-  document.getElementById("sessionsPill").textContent =
-    `Sessions updated ${rows[0]?.updated ?? "?"} · checked ${nowHHMM}`;
+// Danger level shown on the gauge, from the gust speed
+function dangerLevel(gusts) {
+  if (gusts < 15) return { text: "GLASSY", cls: "" };
+  if (gusts < 25) return { text: "CHOPPY", cls: "" };
+  if (gusts < 40) return { text: "WILD", cls: "wild" };
+  return { text: "EXTREME", cls: "extreme" };
+}
 
-  const cls = r => r.status.startsWith("Going") ? "s-ok"
-    : r.status.startsWith("Not going") || r.status === "Fully booked" ? "s-bad" : "s-warn";
-  const table = document.getElementById("dataTable");
-  table.innerHTML = "<tr><th>Session</th><th>Start</th><th>Price</th><th>Places</th><th>Wind limit</th><th>Status</th></tr>";
-  for (const r of rows) {
-    const tr = document.createElement("tr");
-    for (const v of [r.session, r.start_time, "€" + r.price_eur, r.slots, r.maxWind + " km/h", r.status]) {
-      const td = document.createElement("td");
-      td.textContent = v;
-      tr.appendChild(td);
-    }
-    tr.lastChild.className = cls(r);
-    table.appendChild(tr);
+function updateBoard(weather, rows, nowHHMM) {
+  const gusts = Number(weather.wind_gusts_10m);
+
+  // Gauge: 0 km/h = -90deg, 60+ km/h = +90deg
+  const angle = Math.min(gusts, 60) / 60 * 180 - 90;
+  document.getElementById("needle").style.transform = `rotate(${angle}deg)`;
+  document.getElementById("gusts").innerHTML = "";
+  document.getElementById("gusts").append(String(gusts), Object.assign(document.createElement("small"), { textContent: " km/h" }));
+  const d = dangerLevel(gusts);
+  const dangerEl = document.getElementById("danger");
+  dangerEl.textContent = d.text;
+  dangerEl.className = "danger " + d.cls;
+
+  document.getElementById("wind").textContent = weather.wind_speed_10m + " km/h";
+  document.getElementById("temp").textContent = weather.temperature_2m + " °C";
+  document.getElementById("rain").textContent = weather.precipitation + " mm";
+
+  document.getElementById("sessionsLabel").textContent =
+    `Today's sessions · sheet ${rows[0]?.updated ?? "?"} · checked ${nowHHMM}`;
+
+  const list = document.getElementById("sessions");
+  list.innerHTML = "";
+  const sorted = [...rows].sort((a, b) => toMinutes(a.start_time) - toMinutes(b.start_time));
+  for (const r of sorted) {
+    let cls, tag;
+    if (r.timing !== "upcoming") { cls = "past"; tag = r.timing === "finished" ? "Done" : "On now"; }
+    else if (r.slots <= 0) { cls = "full"; tag = "Full"; }
+    else if (!r.windOk) { cls = "wind"; tag = "Too windy"; }
+    else { cls = "go"; tag = r.slots + " left"; }
+
+    const row = document.createElement("div");
+    row.className = "srow " + cls;
+    const t = document.createElement("div"); t.className = "t"; t.textContent = r.start_time;
+    const n = document.createElement("div"); n.className = "n"; n.textContent = r.session + " ";
+    const p = document.createElement("span"); p.textContent = "€" + r.price_eur + " · max " + r.maxWind + " km/h";
+    n.appendChild(p);
+    const g = document.createElement("div"); g.className = "tag"; g.textContent = tag;
+    row.append(t, n, g);
+    list.appendChild(row);
   }
 }
 
@@ -343,24 +527,25 @@ async function loadLiveData() {
   const [sessions, weather] = await Promise.all([getSessions(), getWeather()]);
   const now = dublinTimeNow();
   const rows = annotate(sessions, weather, now);
-  updateStatus(weather, rows, now);
+  updateBoard(weather, rows, now);
   return { rows, weather, now };
 }
 
 async function handleQuestion(question) {
   addMessage(question, "user");
-  const thinking = addMessage("Checking today's sessions and the weather…", "bot");
+  const thinking = addMessage("Checking the water", "bot", "thinking");
   sendBtn.disabled = true;
   try {
     // Fresh data for EVERY question
     const { rows, weather, now } = await loadLiveData();
     const reply = await askBrain(buildSystemPrompt(rows, weather, now), question);
+    thinking.classList.remove("thinking");
     thinking.textContent = reply;
     history.push({ role: "user", content: question }, { role: "assistant", content: reply });
   } catch (err) {
     thinking.remove();
-    addMessage("Sorry, I couldn't get the live information just now (" + err.message +
-      "). Please try again, or ask at the desk.", "bot", true);
+    addMessage("Wipeout! I couldn't get the live information just now (" + err.message +
+      "). Please try again, or ask at the desk.", "bot", "error");
   } finally {
     sendBtn.disabled = false;
     input.focus();
@@ -379,9 +564,12 @@ document.querySelectorAll(".suggestions button").forEach(b =>
   b.addEventListener("click", () => handleQuestion(b.textContent))
 );
 
-addMessage("Hi! I'm Ask Dockside. Ask me how much a session costs, whether there are places left, or if it'll go ahead in today's wind.", "bot");
+addMessage("Welcome to the dock. Ask me what it costs, whether there's room, or if it's too wild out there. I check live every time.", "bot");
 loadLiveData().catch(err => {
-  document.getElementById("weatherPill").textContent = "Live data unavailable: " + err.message;
+  const dangerEl = document.getElementById("danger");
+  dangerEl.textContent = "NO SIGNAL";
+  dangerEl.className = "danger extreme";
+  document.getElementById("sessionsLabel").textContent = "Live data unavailable: " + err.message;
 });
 </script>
 </body>
